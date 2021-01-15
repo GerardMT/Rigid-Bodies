@@ -8,9 +8,13 @@ class ColliderSphere : public Collider
 public:
     ColliderSphere(float radius);
 
+    void pos(const glm::vec3 &p) override;
+
     void intertialTensorInverted(glm::mat3 &t, float mass) const override;
 
-    float radius_;
+   glm::vec3 pos_;
+
+   float radius_;
 };
 
 #endif // COLLIDERSPHERE_H

@@ -6,7 +6,13 @@
 class Collider
 {
 public:
-    virtual ~Collider() {};
+    ~Collider() {};
+
+    virtual Collider *clone() const = 0;
+
+    virtual void pos(const glm::vec3 &p);
+
+    virtual void rot(const glm::quat &r);
 
     virtual void intertialTensorInverted(glm::mat3 &t, float mass) const = 0;
 };

@@ -11,14 +11,22 @@ class Object;
 class RigidBody
 {
 public:
-    RigidBody(Object &obj, float mass);
+    friend class Object;
+
+    RigidBody(float mass, Collider &collider);
+
+    RigidBody(const RigidBody &r);
 
     ~RigidBody();
 
-    void setCollider(Collider &c);
+    void pos(const glm::vec3 &v);
 
-    glm::vec3 &pos_;
-    glm::quat &rot_;
+    void rot(const glm::quat &q);
+
+    const glm::vec3 &pos() const;
+
+    const glm::quat &rot() const;
+
     glm::vec3 vel_;
     glm::vec3 lin_mom_;
     glm::vec3 ang_mom_;
@@ -34,6 +42,12 @@ public:
     Collider *collider_;
 
     bool fixed_;
+
+private:
+    glm::vec3 *pos_;
+    glm::quat *rot_;
+
+    bool reference_;
 };
 
 #endif // RIGIDBODY_H

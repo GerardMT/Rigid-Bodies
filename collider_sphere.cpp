@@ -6,6 +6,11 @@ ColliderSphere::ColliderSphere(float radius)
     radius_ = radius;
 }
 
+void ColliderSphere::pos(const glm::vec3 &p)
+{
+    pos_ += p;
+}
+
 void ColliderSphere::intertialTensorInverted(glm::mat3 &t, float mass) const
 {
     float v = 0.5 * radius_ * radius_ * 5.0f * 1.0f / mass;

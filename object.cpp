@@ -32,6 +32,8 @@ Object::~Object()
 void Object::setRigibody(RigidBody &r)
 {
     rigid_body_ = &r;
+    rigid_body_->pos_ = &pos_;
+    rigid_body_->rot_ = &rot_;
 }
 
 void Object::initialieGL()
@@ -87,4 +89,14 @@ void Object::paintGL(__attribute__((unused)) float dt, const Camera &camera)
     glBindVertexArray(0);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+const glm::vec3 &Object::pos() const
+{
+    return pos_;
+}
+
+const glm::quat &Object::rot() const
+{
+    return rot_;
 }

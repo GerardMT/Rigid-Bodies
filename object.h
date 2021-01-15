@@ -21,8 +21,9 @@ public:
 
     void paintGL(float dt, const Camera &camera) override;
 
-    glm::vec3 pos_;
-    glm::quat rot_;
+    const glm::vec3 &pos() const;
+
+    const glm::quat &rot() const;
 
 private:
     Mesh *mesh_;
@@ -37,6 +38,9 @@ private:
     GLuint vbo_;
     GLuint nbo_;
     GLuint fbo_;
+
+    glm::vec3 pos_;
+    glm::quat rot_;
 };
 
 #endif // OBJECT_H

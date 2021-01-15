@@ -12,8 +12,6 @@ using namespace std;
 class RigidBodiesSystem
 {
 public:
-    RigidBodiesSystem();
-
     ~RigidBodiesSystem();
 
     void addRigidBody(RigidBody &r);
