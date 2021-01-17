@@ -6,9 +6,17 @@ ColliderSphere::ColliderSphere(float radius)
     radius_ = radius;
 }
 
+ColliderSphere::~ColliderSphere()
+{
+}
+
 void ColliderSphere::pos(const glm::vec3 &p)
 {
-    pos_ += p;
+    pos_ = p;
+}
+
+void ColliderSphere::rot(const glm::quat &r)
+{
 }
 
 void ColliderSphere::intertialTensorInverted(glm::mat3 &t, float mass) const

@@ -21,7 +21,8 @@ public:
     void update(float dt);
 
 private:
-    const float contact_point_dist_ = 0.1f;
+    const float contact_point_dist_ = 0.05f;
+    const float relative_velocity_threshold_ = 0.05;
 
     vector<RigidBody *> rigid_bodies_;
 

@@ -7,6 +7,7 @@ TEMPLATE = app
 
 CONFIG += c++14
 CONFIG(release, release|debug):QMAKE_CXXFLAGS += -Wall -O2
+CONFIG(debug, release|debug):QMAKE_CXXFLAGS += -Wall -O0 -g3
 
 CONFIG(release, release|debug):DESTDIR = release/
 CONFIG(release, release|debug):OBJECTS_DIR = release/

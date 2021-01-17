@@ -15,8 +15,6 @@ public:
 
     RigidBody(float mass, Collider &collider);
 
-    RigidBody(const RigidBody &r);
-
     ~RigidBody();
 
     void pos(const glm::vec3 &v);
@@ -35,9 +33,12 @@ public:
     glm::vec3 force_;
     glm::vec3 torque_;
 
+    glm::mat3 i_inv_;
+    glm::vec3 w_;
+
     // Constants
     float mass_;
-    glm::mat3 intertia_tensor_inv_;
+    glm::mat3 inertia_tensor_inv_;
 
     Collider *collider_;
 
@@ -46,8 +47,6 @@ public:
 private:
     glm::vec3 *pos_;
     glm::quat *rot_;
-
-    bool reference_;
 };
 
 #endif // RIGIDBODY_H

@@ -34,9 +34,21 @@ void solve(RigidBody &r, float dt)
 
     r.ang_mom_= r.ang_mom_+ dt * r.torque_;
     glm::mat3 rot_mat = glm::toMat3(r.rot());
-    glm::mat3 i_inv = rot_mat * r.intertia_tensor_inv_ * glm::transpose(rot_mat);
-    glm::vec3 w = i_inv * r.ang_mom_;
-    glm::quat rot_der_ = 0.5f * w * r.rot();
+    r.i_inv_ = rot_mat * r.inertia_tensor_inv_ * glm::transpose(rot_mat);
+    r.w_ = r.i_inv_ * r.ang_mom_;
+    glm::quat rot_der_ = 0.5f * r.w_ * r.rot();
+    r.rot(glm::mix(r.rot(), rot_der_, dt));
+}
+
+void solve_impulse(RigidBody &r, float dt)
+{
+    r.vel_ = r.lin_mom_ / r.mass_;
+    r.pos(r.pos() + dt * r.vel_);
+
+    glm::mat3 rot_mat = glm::toMat3(r.rot());
+    r.i_inv_ = rot_mat * r.inertia_tensor_inv_ * glm::transpose(rot_mat);
+    r.w_ = r.i_inv_ * r.ang_mom_;
+    glm::quat rot_der_ = 0.5f * r.w_ * r.rot();
     r.rot(glm::mix(r.rot(), rot_der_, dt));
 }
 
@@ -47,6 +59,7 @@ void RigidBodiesSystem::update(float dt)
             continue;
         }
 
+        r_a->force_ = glm::vec3(0.0);
         for (auto &f : force_fields_) {
             f->apply(*r_a);
         }
@@ -54,13 +67,11 @@ void RigidBodiesSystem::update(float dt)
         solve(*r_a, dt);
 
         bool collision;
-        bool collision_free = true;
         do {
             collision = false;
             for (auto &r_b : rigid_bodies_) {
                 if (r_a != r_b) {
                     collision = collide(*r_a, *r_b, dt);
-                    collision_free = false;
                     break;
                 }
             }
@@ -70,11 +81,11 @@ void RigidBodiesSystem::update(float dt)
 
 inline void contactPointSphereSphere(const ColliderSphere &sphere_a, const ColliderSphere &sphere_b, float &contact_dist, glm::vec3 &contact_point, glm::vec3 &contact_norm)
 {
-    glm::vec3 ab = sphere_a.pos_ - sphere_b.pos_;
+    glm::vec3 ba = sphere_a.pos_ - sphere_b.pos_;
 
-    contact_dist = glm::length(ab) - sphere_a.radius_ + sphere_b.radius_;
-    contact_point = sphere_a.pos_ + 0.5f * ab;
-    contact_norm = glm::normalize(-ab);
+    contact_dist = glm::length(ba) - (sphere_a.radius_ + sphere_b.radius_);
+    contact_point = sphere_b.pos_ + 0.5f * ba;
+    contact_norm = glm::normalize(ba);
 }
 
 inline void contactPointBoxBox(const ColliderBox &box_a, const ColliderBox &box_b, float &contact_dist, glm::vec3 &contact_point, glm::vec3 &contact_norm)
@@ -123,6 +134,7 @@ void contactPoint(RigidBody &r_a, RigidBody &r_b, float &contact_dist, glm::vec3
 
 bool RigidBodiesSystem::collide(RigidBody &r_a, RigidBody &r_b, float dt)
 {
+    // Find contact
     float contact_dist;
     glm::vec3 contact_point;
     glm::vec3 contact_norm;
@@ -132,35 +144,44 @@ bool RigidBodiesSystem::collide(RigidBody &r_a, RigidBody &r_b, float dt)
         return false;
     }
 
-    while (abs(contact_dist) > contact_point_dist_) {
-        float dt_step = (contact_dist < 0) ? -dt : +dt;
-        dt *= 0.5;
+    float dt_contact = dt;
+    unsigned int it = 0;
+    while (abs(contact_dist) > contact_point_dist_ && it < 10) {
+        float dt_step = (contact_dist < 0) ? -dt_contact : +dt_contact ;
+        dt_contact *= 0.5;
 
         solve(r_a, dt_step);
-        solve(r_b, dt_step);
+        if (!r_b.fixed_) {
+            solve(r_b, dt_step);
+        }
 
         contactPoint(r_a, r_b, contact_dist, contact_point, contact_norm);
+        ++it;
     }
 
     // Impulse
-    const float coef_restitution = 0.5;
-
-    glm::vec3 w_a = r_a.intertia_tensor_inv_ * r_a.ang_mom_;
-    glm::vec3 w_b = r_b.intertia_tensor_inv_ * r_b.ang_mom_;
-
-    glm::vec3 p_v_a = r_a.vel_ + glm::cross(w_a, contact_point - r_a.pos());
-    glm::vec3 p_v_b = r_a.vel_ + glm::cross(w_b, contact_point - r_b.pos());
-
-    float v_r = glm::dot(contact_norm, (p_v_a - p_v_b));
+    const float coef_restitution = 0.5f;
 
     glm::vec3 rr_a = contact_point - r_a.pos();
     glm::vec3 rr_b = contact_point - r_b.pos();
 
-    float den_mass = 1.0f / r_a.mass_ + 1.0f / r_b.mass_;
-    float den_a = glm::dot(contact_norm, glm::cross(r_a.intertia_tensor_inv_ * glm::cross(rr_a, contact_norm), rr_a));
-    float den_b = glm::dot(contact_norm, glm::cross(r_b.intertia_tensor_inv_ * glm::cross(rr_b, contact_norm), rr_b));
+    glm::vec3 p_v_a = r_a.vel_ + glm::cross(r_a.w_, rr_a);
+    glm::vec3 p_v_b = r_b.vel_ + glm::cross(r_b.w_, rr_b);
 
-    float j = (-(1 + coef_restitution) * v_r) / (den_mass + den_a + den_b);
+    float v_r = glm::dot(contact_norm, (p_v_a - p_v_b));
+
+    if (v_r > relative_velocity_threshold_) {
+        return false;
+    } else if (v_r > -relative_velocity_threshold_)  {
+        return false; // Resting
+    }
+
+    float den_mass_a = r_a.fixed_ ? 0.0f : 1.0f / r_a.mass_;
+    float den_mass_b = r_b.fixed_ ? 0.0f : 1.0f / r_b.mass_;
+    float den_a = r_a.fixed_ ? 0.0f : glm::dot(contact_norm, glm::cross(r_a.i_inv_ * glm::cross(rr_a, contact_norm), rr_a));
+    float den_b = r_b.fixed_ ? 0.0f : glm::dot(contact_norm, glm::cross(r_b.i_inv_ * glm::cross(rr_b, contact_norm), rr_b));
+
+    float j = (-(1 + coef_restitution) * v_r) / (den_mass_a + den_mass_b + den_a + den_b);
 
     glm::vec3 J = j * contact_norm;
 
@@ -170,6 +191,14 @@ bool RigidBodiesSystem::collide(RigidBody &r_a, RigidBody &r_b, float dt)
     r_a.ang_mom_ += glm::cross(rr_a, J);
     r_b.ang_mom_ -= glm::cross(rr_b, J);
 
-    return true;
+    float dt_impulse = dt - dt_contact;
+    if (!r_a.fixed_) {
+        solve(r_a, dt_impulse);
+    }
+    if (!r_b.fixed_) {
+        solve(r_b, dt_impulse);
+    }
+
+    return true; // TODO DEBUG
 }
 

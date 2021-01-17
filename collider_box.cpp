@@ -2,38 +2,22 @@
 
 #include <glm/gtx/quaternion.hpp>
 
-
-ColliderBox::ColliderBox()
-{
-}
-
 ColliderBox::ColliderBox(float a, float b, float c)
 {
     a_ = a;
     b_ = b;
     c_ = c;
 
-    min_.x = +a / 2.0f;
-    min_.y = +b / 2.0f;
-    min_.z = +c / 2.0f;
-    max_.x = -a / 2.0f;
-    max_.y = -b / 2.0f;
-    max_.z = -c / 2.0f;
+    max_.x = +a / 2.0f;
+    max_.y = +b / 2.0f;
+    max_.z = +c / 2.0f;
+    min_.x = -a / 2.0f;
+    min_.y = -b / 2.0f;
+    min_.z = -c / 2.0f;
 }
 
-Collider *ColliderBox::clone() const
+ColliderBox::~ColliderBox()
 {
-    ColliderBox *box = new ColliderBox();
-
-    box->pos_ = pos_;
-    box->rot_ = rot_;
-    box->min_ = min_;
-    box->max_ = max_;
-    box->a_ = a_;
-    box->b_ = b_;
-    box->c_ = c_;
-
-    return box;
 }
 
 void ColliderBox::pos(const glm::vec3 &p)

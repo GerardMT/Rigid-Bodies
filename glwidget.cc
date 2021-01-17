@@ -32,7 +32,7 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {    
-    camera_.pos_ = glm::vec3(-1.0, 0.5, -2.0);
+    camera_.pos_ = glm::vec3(-5.0, 0.0, 0.0);
     camera_.fov_y_ = glm::radians(80.0f);
     camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
 
@@ -40,29 +40,32 @@ void GLWidget::initializeGL()
     rigid_bodies_system->addForceField(*new ForceFieldGravity());
     rigid_bodies_system->addForceField(*new ForceFieldDrag(0.1));
 
-    Mesh *m = new Mesh();
-    Mesh::ReadFromPly("../model/cube.ply", *m);
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
 
-    Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
-    objects_.push_back(box);
-    paint_gl_.push_back(box);
+        Object *box = new Object(glm::vec3(0.0f, 10.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
 
-    RigidBody *rigid_body = new RigidBody(*box, 1.0f);
-    rigid_body->setCollider(*new ColliderBox(1.0f, 1.0f, 1.0f));
-    rigid_bodies_system->addRigidBody(*rigid_body);
-    box->setRigibody(*rigid_body);
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        box->setRigibody(*rigid_body);
+    }
 
-    m = new Mesh();
-    Mesh::ReadFromPly("../model/sphere.ply", *m);
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
 
-    Object *sphere = new Object(glm::vec3(0.0f, 2.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
-    objects_.push_back(sphere);
-    paint_gl_.push_back(sphere);
+        Object *sphere = new Object(glm::vec3(0.0f, 0.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
 
-    rigid_body = new RigidBody(*sphere, 1.0f);
-    rigid_body->setCollider(*new ColliderSphere(1.0f));
-    rigid_bodies_system->addRigidBody(*rigid_body);
-    sphere->setRigibody(*rigid_body);
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        sphere->setRigibody(*rigid_body);
+    }
 
     glewInit();
 
@@ -80,7 +83,7 @@ void GLWidget::initializeGL()
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(target_frame_time_);
+    timer->start(target_frame_time_ * 1000.0f);
 }
 
 #pragma GCC diagnostic push

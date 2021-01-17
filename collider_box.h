@@ -10,7 +10,7 @@ class ColliderBox : public Collider
 public:    
     ColliderBox(float a, float b, float c);
 
-    Collider *clone() const override;
+    ~ColliderBox();
 
     void pos(const glm::vec3 &p) override;
 
@@ -27,8 +27,6 @@ public:
     glm::vec3 max_;
 
 private:
-    ColliderBox();
-
     float a_;
     float b_;
     float c_;
