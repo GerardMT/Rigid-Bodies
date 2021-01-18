@@ -19,24 +19,24 @@ RigidBody::RigidBody(float mass, Collider &collider)
 
     mass_ = mass;
 
-    force_ = glm::vec3(0);
-    torque_ = glm::vec3(0);
+    force_ = glm::vec3(0.0f);
+    torque_ = glm::vec3(0.0f);
 
     collider.intertialTensorInverted(inertia_tensor_inv_, mass_);
 
     fixed_ = false;
 }
 
-void RigidBody::pos(const glm::vec3 &v)
+void RigidBody::translate(const glm::vec3 &t)
 {
-    *pos_ = v;
-    collider_->pos(v);
+    *pos_ += t;
+    collider_->translate(t);
 }
 
-void RigidBody::rot(const glm::quat &q)
+void RigidBody::rotate(const glm::quat &q)
 {
-    *rot_ = q;
-    collider_->rot(q);
+    *rot_ = glm::normalize(*rot_ * q);
+    collider_->rotate(q);
 }
 
 const glm::vec3 &RigidBody::pos() const

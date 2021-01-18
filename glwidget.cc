@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <QMouseEvent>
+#include <QDoubleSpinBox>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
@@ -32,79 +33,11 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {    
-    camera_.pos_ = glm::vec3(-7.0, 4.0, -6.0);
     camera_.fov_y_ = glm::radians(80.0f);
-    camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
 
     rigid_bodies_system = new RigidBodiesSystem();
     rigid_bodies_system->addForceField(*new ForceFieldGravity());
     rigid_bodies_system->addForceField(*new ForceFieldDrag(0.1));
-
-//    {
-//        Mesh *m = new Mesh();
-//        Mesh::ReadFromPly("../model/cube.ply", *m);
-
-//        Object *box = new Object(glm::vec3(0.0f, 1.1f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
-//        objects_.push_back(box);
-//        paint_gl_.push_back(box);
-
-//        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
-//        rigid_bodies_system->addRigidBody(*rigid_body);
-//        box->setRigibody(*rigid_body);
-//    }
-
-    {
-        Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
-
-        Object *sphere = new Object(glm::vec3(0.0f, 8.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
-        objects_.push_back(sphere);
-        paint_gl_.push_back(sphere);
-
-        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
-        rigid_bodies_system->addRigidBody(*rigid_body);
-        sphere->setRigibody(*rigid_body);
-    }
-
-    {
-        Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
-
-        Object *box = new Object(glm::vec3(0.0f, 6.0f, 0.5f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
-        objects_.push_back(box);
-        paint_gl_.push_back(box);
-
-        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
-        rigid_bodies_system->addRigidBody(*rigid_body);
-        box->setRigibody(*rigid_body);
-    }
-
-    {
-        Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
-
-        Object *sphere = new Object(glm::vec3(0.0f, 4.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
-        objects_.push_back(sphere);
-        paint_gl_.push_back(sphere);
-
-        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
-        rigid_bodies_system->addRigidBody(*rigid_body);
-        sphere->setRigibody(*rigid_body);
-    }
-
-    {
-        Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/box_10_1_10.ply", *m);
-
-        Object *box = new Object(glm::vec3(0.0f, 1.1f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
-        objects_.push_back(box);
-        paint_gl_.push_back(box);
-
-        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(10.0f, 1.0f, 10.0f));
-        rigid_bodies_system->addRigidBody(*rigid_body);
-        rigid_body->fixed_ = true;
-        box->setRigibody(*rigid_body);
-    }
 
     glewInit();
 
@@ -114,9 +47,9 @@ void GLWidget::initializeGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    for (auto p : paint_gl_) {
-        p->initialieGL();
-    }
+    uiScene1();
+
+    rigid_bodies_system->coefficient_of_restitution_ = parent()->findChild<QDoubleSpinBox *>("coefficientOfRestitution")->value();
 
     target_frame_time_ = 1.0f / 60.0f;
 
@@ -248,7 +181,260 @@ void GLWidget::paintGL() {
     time_last_ = time_now;
 }
 
-void GLWidget::uiReset()
+void GLWidget::clear()
 {
-    // TODO
+    for (auto o : objects_) {
+        delete o;
+    }
+    objects_.clear();
+    paint_gl_.clear();
+    rigid_bodies_system->clear();
+}
+
+void GLWidget::uiScene1()
+{
+    clear();
+
+    camera_.pos_ = glm::vec3(-3.0, 3.0, -3.0);
+    camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 4.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        sphere->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        box->setRigibody(*rigid_body);
+    }
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiScene2()
+{
+    clear();
+
+    camera_.pos_ = glm::vec3(-3.0, 1.0, -3.0);
+    camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 4.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        sphere->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 8.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        sphere->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        box->setRigibody(*rigid_body);
+    }
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiScene3()
+{
+    clear();
+
+    camera_.pos_ = glm::vec3(-3.0, 1.0, 0.0);
+    camera_.lookAt(glm::vec3(0.0, 1.0, 0.0));
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 5.0f, 0.41f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        box->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 0.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        sphere->setRigibody(*rigid_body);
+    }
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiScene4()
+{
+    clear();
+
+    camera_.pos_ = glm::vec3(-4.0, 2, -1.0);
+    camera_.lookAt(glm::vec3(0.0, 0.5, 0.0));
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 5.0f, 0.9f),  glm::quat(glm::radians(glm::vec3(90.0, 45.0, 0.0))), *m, glm::vec4(1.0, 0.0, 1.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        box->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        box->setRigibody(*rigid_body);
+    }
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiScene5()
+{
+    clear();
+
+    camera_.pos_ = glm::vec3(-7.0, 4.0, -6.0);
+    camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 10.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        sphere->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/cube.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 8.0f, 0.25f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(1.0f, 1.0f, 1.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        box->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+        Object *sphere = new Object(glm::vec3(0.0f, 6.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
+        objects_.push_back(sphere);
+        paint_gl_.push_back(sphere);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        sphere->setRigibody(*rigid_body);
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/box_10_1_10.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 1.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(10.0f, 1.0f, 10.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        box->setRigibody(*rigid_body);
+    }
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiScene6()
+{
+    clear();
+
+    for (auto p : paint_gl_) {
+        p->initialieGL();
+    }
+}
+
+void GLWidget::uiCoefficientOfRestitution(double v)
+{
+    rigid_bodies_system->coefficient_of_restitution_ = v;
 }

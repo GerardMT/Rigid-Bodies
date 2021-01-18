@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Object::Object(glm::vec3 pos, glm::quat rot, Mesh &m, glm::vec4 color)
+Object::Object(const glm::vec3 &pos, const glm::quat &rot, Mesh &m, const glm::vec4 &color)
 {
     pos_ = pos;
     rot_ = rot;
@@ -35,8 +35,8 @@ void Object::setRigibody(RigidBody &r)
     rigid_body_->pos_ = &pos_;
     rigid_body_->rot_ = &rot_;
 
-    rigid_body_->pos(pos_);
-    rigid_body_->rot(rot_);
+    rigid_body_->collider_->rotate(rot_);
+    rigid_body_->collider_->translate(pos_);
 }
 
 void Object::initialieGL()

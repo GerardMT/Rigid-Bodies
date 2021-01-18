@@ -10,9 +10,9 @@ class Collider
 public:
     virtual ~Collider() {};
 
-    virtual void pos(const glm::vec3 &p) = 0;
+    virtual void translate(const glm::vec3 &t) = 0;
 
-    virtual void rot(const glm::quat &r) = 0;
+    virtual void rotate(const glm::quat &r) = 0;
 
     virtual void intertialTensorInverted(glm::mat3 &t, float mass) const = 0;
 

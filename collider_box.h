@@ -12,9 +12,9 @@ public:
 
     ~ColliderBox();
 
-    void pos(const glm::vec3 &p) override;
+    void translate(const glm::vec3 &t) override;
 
-    void rot(const glm::quat &r) override;
+    void rotate(const glm::quat &r) override;
 
     void intertialTensorInverted(glm::mat3 &t, float mass) const override;
 
@@ -26,7 +26,8 @@ public:
     glm::vec3 min_;
     glm::vec3 max_;
 
-private:
+    glm::vec3 vertices_[NUM_VERTICES];
+
     float a_;
     float b_;
     float c_;

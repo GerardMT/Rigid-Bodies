@@ -11,7 +11,7 @@
 class Object : public PaintGL
 {
 public:
-    Object(glm::vec3 pos, glm::quat rot, Mesh &m, glm::vec4 color);
+    Object(const glm::vec3 &pos, const glm::quat &rot, Mesh &m, const glm::vec4 &color);
 
     ~Object();
 

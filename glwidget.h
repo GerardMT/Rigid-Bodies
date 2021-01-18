@@ -39,6 +39,8 @@ protected:
 
     void paintGL() override;
 
+    void clear();
+
 private:
     Camera camera_;
 
@@ -69,7 +71,19 @@ private:
     float target_frame_time_;
 
 private slots:
-    void uiReset();
+    void uiScene1();
+
+    void uiScene2();
+
+    void uiScene3();
+
+    void uiScene4();
+
+    void uiScene5();
+
+    void uiScene6();
+
+    void uiCoefficientOfRestitution(double v);
 };
 
 #endif  //  GLWIDGET_H_

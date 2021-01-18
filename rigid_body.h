@@ -17,9 +17,9 @@ public:
 
     ~RigidBody();
 
-    void pos(const glm::vec3 &v);
+    void translate(const glm::vec3 &t);
 
-    void rot(const glm::quat &q);
+    void rotate(const glm::quat &q);
 
     const glm::vec3 &pos() const;
 

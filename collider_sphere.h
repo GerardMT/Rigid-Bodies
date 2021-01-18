@@ -10,9 +10,9 @@ public:
 
     ~ColliderSphere();
 
-    void pos(const glm::vec3 &p) override;
+    void translate(const glm::vec3 &t) override;
 
-    void rot(const glm::quat &r) override;
+    void rotate(const glm::quat &r) override;
 
     void intertialTensorInverted(glm::mat3 &t, float mass) const override;
 

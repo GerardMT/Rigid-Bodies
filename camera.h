@@ -28,7 +28,7 @@ public:
     GLfloat far_ = 100.0f;
 
     float speed_ = 5.0;
-    float sensitivity_ = 10.0;
+    float sensitivity_ = 25.0;
 
     void lookAt(glm::vec3 pos);
 
