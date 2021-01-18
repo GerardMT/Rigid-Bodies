@@ -12,6 +12,7 @@ RigidBody::~RigidBody()
 RigidBody::RigidBody(float mass, Collider &collider)
 {
     collider_ = &collider;
+    collider_->rigid_body_ = this;
 
     lin_mom_ = glm::vec3(0.0f, 0.0f, 0.0f);
     ang_mom_ = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -21,7 +22,7 @@ RigidBody::RigidBody(float mass, Collider &collider)
     force_ = glm::vec3(0);
     torque_ = glm::vec3(0);
 
-    collider.intertialTensorInverted(inertia_tensor_inv_, mass);
+    collider.intertialTensorInverted(inertia_tensor_inv_, mass_);
 
     fixed_ = false;
 }

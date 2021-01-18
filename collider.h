@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+class RigidBody;
+
 class Collider
 {
 public:
@@ -13,6 +15,8 @@ public:
     virtual void rot(const glm::quat &r) = 0;
 
     virtual void intertialTensorInverted(glm::mat3 &t, float mass) const = 0;
+
+    RigidBody *rigid_body_;
 };
 
 #endif // COLLIDER_H
