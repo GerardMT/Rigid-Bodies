@@ -191,6 +191,25 @@
         <string>Coefficient of restitution</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="fixOnResting">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>410</y>
+         <width>131</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Fix on resting</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="tristate">
+        <bool>false</bool>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -214,6 +233,7 @@
     <slot>uiScene5()</slot>
     <slot>uiScene6()</slot>
     <slot>uiCoefficientOfRestitution(double)</slot>
+    <slot>uiFixOnResting(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -328,6 +348,22 @@
     <hint type="destinationlabel">
      <x>476</x>
      <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fixOnResting</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>uiFixOnResting(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>548</x>
+     <y>544</y>
     </hint>
    </hints>
   </connection>

@@ -36,8 +36,9 @@ void solve(RigidBody &r, float dt)
     glm::mat3 rot_mat = glm::toMat3(r.rot());
     r.i_inv_ = rot_mat * r.inertia_tensor_inv_ * glm::transpose(rot_mat);
     r.w_ = r.i_inv_ * r.ang_mom_;
-    glm::quat rot_der_ = 0.5f * r.w_ * dt * r.rot();
-    r.rotate(rot_der_);
+    glm::quat rot_der_ = 0.5f * (glm::quat(0.0, (r.w_)) * r.rot());
+    glm::quat rot_diff = glm::normalize(r.rot() + dt * rot_der_) * glm::inverse(r.rot());
+    r.rotate(rot_diff);
 }
 
 void RigidBodiesSystem::update(float dt)
@@ -118,6 +119,17 @@ void RigidBodiesSystem::update(float dt)
                 }
 
                 if (contacts.size() == 0) { // Unable to get contact point because of not contempling resting contact
+                    // Fix them
+                    if (fix_on_resting_) {
+                        for (unsigned int i = 0; i < rigid_bodies_.size(); ++i) {
+                            for (unsigned int j = 0; j < i ; ++j) {
+                                if(contactPoints(*rigid_bodies_[i], *rigid_bodies_[j], contacts)) {
+                                    rigid_bodies_[i]->fixed_ = true;
+                                    rigid_bodies_[j]->fixed_ = true;
+                                }
+                            }
+                        }
+                    }
                     interpenetration = false; // Allow exit
                 }
             }
@@ -152,8 +164,10 @@ bool RigidBodiesSystem::colliding(Contact &c)
     if(v_r > relative_velocity_threshold_) { // Moving away
         return false;
     } else if (v_r > -relative_velocity_threshold_) { // Resting contact
-        c.r_a_->fixed_ = true;
-        c.r_b_->fixed_ = true;
+        if (fix_on_resting_) {
+            c.r_a_->fixed_ = true;
+            c.r_b_->fixed_ = true;
+        }
         return false;
     } else {
         return true;
@@ -189,28 +203,31 @@ inline bool RigidBodiesSystem::contactPointBoxBoxImmersive(const ColliderBox &bo
     for (unsigned int i = 0; i < ColliderBox::NUM_VERTICES; ++i) {
         glm::vec3 vert_pos = glm::toMat3(glm::inverse(box_a.rot_)) * (box_b.vertices_[i] - box_a.pos_);
 
-        Contact c;
-        glm::vec3 d;
-        d.x = max(abs(vert_pos.x) - box_a.a_ / 2.0f, 0.0f);
-        d.y = max(abs(vert_pos.y) - box_a.b_ / 2.0f, 0.0f);
-        d.z = max(abs(vert_pos.z) - box_a.c_ / 2.0f, 0.0f);
-
-        c.dist_= d.x * d.x + d.y * d.y + d.z * d.z;
-
-        if (c.dist_ == 0) { // TODO Missing negative distance
+        if (vert_pos.x > box_a.min_.x + contact_point_dist_ && vert_pos.x < box_a.max_.x - contact_point_dist_
+                && vert_pos.y > box_a.min_.y + contact_point_dist_ && vert_pos.y < box_a.max_.y - contact_point_dist_
+                && vert_pos.z > box_a.min_.z + contact_point_dist_&& vert_pos.z < box_a.max_.z - contact_point_dist_) {
             return true;
         }
 
-        c.p_ = vert_pos;
-        c.n_.x = max(box_a.min_.x, min(vert_pos.x, box_a.max_.x));
-        c.n_.y = max(box_a.min_.y, min(vert_pos.y, box_a.max_.y));
-        c.n_.z = max(box_a.min_.z, min(vert_pos.z, box_a.max_.z));
-        c.n_ = glm::normalize(c.n_);
+        Contact c;
+        c.p_ = glm::toMat3(box_a.rot_) * vert_pos + box_a.pos_;
+
+        glm::vec3 proj;
+        proj.x = max(box_a.min_.x + contact_point_dist_, min(vert_pos.x, box_a.max_.x - contact_point_dist_)); // Not exact
+        proj.y = max(box_a.min_.y + contact_point_dist_, min(vert_pos.y, box_a.max_.y - contact_point_dist_));
+        proj.z = max(box_a.min_.z + contact_point_dist_, min(vert_pos.z, box_a.max_.z - contact_point_dist_));
+        c.n_ = glm::toMat3(box_a.rot_) * glm::normalize(vert_pos - proj) + box_a.pos_;
+
+        c.dist_ = glm::length(vert_pos - proj);
 
         c.r_a_ = box_b.rigid_body_;
         c.r_b_ = box_a.rigid_body_;
 
-        if (c.dist_ < contact_point_dist_ && colliding(c)) { // TODO Missing negative distance
+        bool contact = vert_pos.x > box_a.min_.x - contact_point_dist_ && vert_pos.x < box_a.max_.x + contact_point_dist_
+                && vert_pos.y > box_a.min_.y - contact_point_dist_ && vert_pos.y < box_a.max_.y + contact_point_dist_
+                && vert_pos.z > box_a.min_.z - contact_point_dist_&& vert_pos.z < box_a.max_.z + contact_point_dist_;
+
+        if (contact && colliding(c)) { // TODO Missing negative distance
             contacts.push_back(c);
         }
     }
@@ -294,8 +311,8 @@ void RigidBodiesSystem::collision(const vector<Contact> &contacts)
         glm::vec3 rr_a = c.p_ - c.r_a_->pos();
         glm::vec3 rr_b = c.p_ - c.r_b_->pos();
 
-        glm::vec3 p_v_a = c.r_a_->vel_ + glm::cross(c.r_a_->w_, rr_a);
-        glm::vec3 p_v_b = c.r_b_->vel_ + glm::cross(c.r_b_->w_, rr_b);
+        glm::vec3 p_v_a = c.r_a_->fixed_ ? glm::vec3(0.0f) : c.r_a_->vel_ + glm::cross(c.r_a_->w_, rr_a);
+        glm::vec3 p_v_b = c.r_b_->fixed_ ? glm::vec3(0.0f) : c.r_b_->vel_ + glm::cross(c.r_b_->w_, rr_b);
 
         float v_r = glm::dot(c.n_, (p_v_a - p_v_b));
 
@@ -313,10 +330,6 @@ void RigidBodiesSystem::collision(const vector<Contact> &contacts)
 
         c.r_a_->ang_mom_ += glm::cross(rr_a, J);
         c.r_b_->ang_mom_ -= glm::cross(rr_b, J);
-
-        if (j == INFINITY || j == -INFINITY) {
-            int a = 0;
-        }
     }
 }
 

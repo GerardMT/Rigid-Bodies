@@ -35,7 +35,7 @@ void RigidBody::translate(const glm::vec3 &t)
 
 void RigidBody::rotate(const glm::quat &q)
 {
-    *rot_ = glm::normalize(*rot_ * q);
+    *rot_ = q * *rot_;
     collider_->rotate(q);
 }
 

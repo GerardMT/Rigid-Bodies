@@ -26,6 +26,8 @@ public:
 
     float coefficient_of_restitution_ = 0.5f;
 
+    bool fix_on_resting_ = false;
+
 private:
     struct Contact {
         glm::vec3 p_;
@@ -36,7 +38,7 @@ private:
     };
 
     const float contact_point_dist_ = 0.01f;
-    const float relative_velocity_threshold_ = 0.071;
+    const float relative_velocity_threshold_ = 0.1;
 
     const unsigned int contact_steps_ = 10;
 

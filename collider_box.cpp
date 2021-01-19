@@ -48,17 +48,17 @@ void ColliderBox::translate(const glm::vec3 &t)
 
 void ColliderBox::rotate(const glm::quat &r)
 {
-    rot_ = glm::normalize(rot_ * r);
+    rot_ = r * rot_;
 
     glm::mat3 mat = glm::toMat3(r);
-    vertices_[0] = mat * vertices_[0];
-    vertices_[1] = mat * vertices_[1];
-    vertices_[2] = mat * vertices_[2];
-    vertices_[3] = mat * vertices_[3];
-    vertices_[4] = mat * vertices_[4];
-    vertices_[5] = mat * vertices_[5];
-    vertices_[6] = mat * vertices_[6];
-    vertices_[7] = mat * vertices_[7];
+    vertices_[0] = mat * (vertices_[0] - pos_) + pos_;
+    vertices_[1] = mat * (vertices_[1] - pos_) + pos_;
+    vertices_[2] = mat * (vertices_[2] - pos_) + pos_;
+    vertices_[3] = mat * (vertices_[3] - pos_) + pos_;
+    vertices_[4] = mat * (vertices_[4] - pos_) + pos_;
+    vertices_[5] = mat * (vertices_[5] - pos_) + pos_;
+    vertices_[6] = mat * (vertices_[6] - pos_) + pos_;
+    vertices_[7] = mat * (vertices_[7] - pos_) + pos_;
 }
 
 void ColliderBox::intertialTensorInverted(glm::mat3 &t, float mass) const

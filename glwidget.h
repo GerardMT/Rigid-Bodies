@@ -70,6 +70,8 @@ private:
     bool first_paint_ = true;
     float target_frame_time_;
 
+    unsigned int scene_;
+
 private slots:
     void uiScene1();
 
@@ -84,6 +86,8 @@ private slots:
     void uiScene6();
 
     void uiCoefficientOfRestitution(double v);
+
+    void uiFixOnResting(bool v);
 };
 
 #endif  //  GLWIDGET_H_

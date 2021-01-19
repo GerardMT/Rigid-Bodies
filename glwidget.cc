@@ -11,6 +11,7 @@
 #include <string>
 #include <QMouseEvent>
 #include <QDoubleSpinBox>
+#include <QCheckBox>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
@@ -47,9 +48,11 @@ void GLWidget::initializeGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    uiScene1();
+    scene_ = -1;
+    uiScene4();
 
     rigid_bodies_system->coefficient_of_restitution_ = parent()->findChild<QDoubleSpinBox *>("coefficientOfRestitution")->value();
+    rigid_bodies_system->fix_on_resting_ = parent()->findChild<QCheckBox *>("fixOnResting")->isChecked();
 
     target_frame_time_ = 1.0f / 60.0f;
 
@@ -195,8 +198,10 @@ void GLWidget::uiScene1()
 {
     clear();
 
-    camera_.pos_ = glm::vec3(-3.0, 3.0, -3.0);
-    camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+    if (scene_ != 1) {
+        camera_.pos_ = glm::vec3(-3.0, 3.0, -3.0);
+        camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+    }
 
     {
         Mesh *m = new Mesh();
@@ -228,14 +233,18 @@ void GLWidget::uiScene1()
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 1;
 }
 
 void GLWidget::uiScene2()
 {
     clear();
 
-    camera_.pos_ = glm::vec3(-3.0, 1.0, -3.0);
-    camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+    if (scene_ != 2) {
+        camera_.pos_ = glm::vec3(-3.0, 1.0, -3.0);
+        camera_.lookAt(glm::vec3(0.0, 2.0, 0.0));
+    }
 
     {
         Mesh *m = new Mesh();
@@ -280,14 +289,18 @@ void GLWidget::uiScene2()
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 2;
 }
 
 void GLWidget::uiScene3()
 {
     clear();
 
-    camera_.pos_ = glm::vec3(-3.0, 1.0, 0.0);
-    camera_.lookAt(glm::vec3(0.0, 1.0, 0.0));
+    if (scene_ != 3) {
+        camera_.pos_ = glm::vec3(-3.0, 1.0, 0.0);
+        camera_.lookAt(glm::vec3(0.0, 1.0, 0.0));
+    }
 
     {
         Mesh *m = new Mesh();
@@ -319,20 +332,39 @@ void GLWidget::uiScene3()
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 3;
+}
+
+glm::quat eulerToQuat(const glm::vec3 &e)
+{
+    float sx = sin(e.x/2);
+    float sy = sin(e.y/2);
+    float sz = sin(e.z/2);
+    float cx = cos(e.x/2);
+    float cy = cos(e.y/2);
+    float cz = cos(e.z/2);
+
+    return glm::quat(cx * cy * cz + sx * sy * sz,
+                     sx * cy * cz - cx * sy * sz,
+                     cx * sy * cz + sx * cy * sz,
+                     cx * cy * sz - sx * sy * cz);
 }
 
 void GLWidget::uiScene4()
 {
     clear();
 
-    camera_.pos_ = glm::vec3(-4.0, 2, -1.0);
-    camera_.lookAt(glm::vec3(0.0, 0.5, 0.0));
+    if (scene_ != 4) {
+        camera_.pos_ = glm::vec3(-4.0, 2, -1.0);
+        camera_.lookAt(glm::vec3(0.0, 0.5, 0.0));
+    }
 
     {
         Mesh *m = new Mesh();
         Mesh::ReadFromPly("../model/cube.ply", *m);
 
-        Object *box = new Object(glm::vec3(0.0f, 5.0f, 0.9f),  glm::quat(glm::radians(glm::vec3(90.0, 45.0, 0.0))), *m, glm::vec4(1.0, 0.0, 1.0, 1.0));
+        Object *box = new Object(glm::vec3(0.0f, 3.0f, 0.25 + 0.707106781f),  eulerToQuat(glm::radians(glm::vec3(0.0, 45.0, 0.0))), *m, glm::vec4(1.0, 0.0, 1.0, 1.0));
         objects_.push_back(box);
         paint_gl_.push_back(box);
 
@@ -358,20 +390,24 @@ void GLWidget::uiScene4()
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 4;
 }
 
 void GLWidget::uiScene5()
 {
     clear();
 
-    camera_.pos_ = glm::vec3(-7.0, 4.0, -6.0);
-    camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
+    if (scene_ != 5) {
+        camera_.pos_ = glm::vec3(-7.0, 4.0, -6.0);
+        camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
+    }
 
     {
         Mesh *m = new Mesh();
         Mesh::ReadFromPly("../model/sphere.ply", *m);
 
-        Object *sphere = new Object(glm::vec3(0.0f, 10.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
+        Object *sphere = new Object(glm::vec3(0.0f, 16.0, 0.5f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
         objects_.push_back(sphere);
         paint_gl_.push_back(sphere);
 
@@ -384,7 +420,7 @@ void GLWidget::uiScene5()
         Mesh *m = new Mesh();
         Mesh::ReadFromPly("../model/cube.ply", *m);
 
-        Object *box = new Object(glm::vec3(0.0f, 8.0f, 0.25f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 0.0, 1.0));
+        Object *box = new Object(glm::vec3(0.0f, 8.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 0.0, 1.0));
         objects_.push_back(box);
         paint_gl_.push_back(box);
 
@@ -423,18 +459,85 @@ void GLWidget::uiScene5()
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 5;
+}
+
+float random(float l, float h)
+{
+    return l + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX / (h - l)));
 }
 
 void GLWidget::uiScene6()
 {
     clear();
 
+    if (scene_ != 6) {
+        camera_.pos_ = glm::vec3(-7.0, 4.0, -6.0);
+        camera_.lookAt(glm::vec3(0.0, 0.0, 0.0));
+    }
+
+    const unsigned int num_balls = 20;
+
+    vector<glm::vec3> balls_pos;
+    balls_pos.reserve(num_balls);
+
+    while (balls_pos.size() < num_balls) {
+        glm::vec3 pos = glm::vec3(random(-3, 3), random(3, 15), random(-3, 3));
+
+        bool save = true;
+        for (auto &b : balls_pos) {
+            if (glm::length(b - pos) < 2.0) {
+                save = false;
+                break;
+            }
+        }
+
+        if (save) {
+            {
+                Mesh *m = new Mesh();
+                Mesh::ReadFromPly("../model/sphere.ply", *m);
+
+                Object *sphere = new Object(pos, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0));
+                objects_.push_back(sphere);
+                paint_gl_.push_back(sphere);
+
+                RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderSphere(0.5f));
+                rigid_bodies_system->addRigidBody(*rigid_body);
+                sphere->setRigibody(*rigid_body);
+            }
+
+            balls_pos.push_back(pos);
+        }
+    }
+
+    {
+        Mesh *m = new Mesh();
+        Mesh::ReadFromPly("../model/box_10_1_10.ply", *m);
+
+        Object *box = new Object(glm::vec3(0.0f, 1.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
+        objects_.push_back(box);
+        paint_gl_.push_back(box);
+
+        RigidBody *rigid_body = new RigidBody(1.0f, *new ColliderBox(10.0f, 1.0f, 10.0f));
+        rigid_bodies_system->addRigidBody(*rigid_body);
+        rigid_body->fixed_ = true;
+        box->setRigibody(*rigid_body);
+    }
+
     for (auto p : paint_gl_) {
         p->initialieGL();
     }
+
+    scene_ = 6;
 }
 
 void GLWidget::uiCoefficientOfRestitution(double v)
 {
     rigid_bodies_system->coefficient_of_restitution_ = v;
+}
+
+void GLWidget::uiFixOnResting(bool v)
+{
+    rigid_bodies_system->fix_on_resting_ = v;
 }
