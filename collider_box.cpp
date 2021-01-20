@@ -2,6 +2,9 @@
 
 #include <glm/gtx/quaternion.hpp>
 
+#include <iostream>
+using namespace std;
+
 ColliderBox::ColliderBox(float a, float b, float c)
 {
     a_ = a;
@@ -72,6 +75,6 @@ void ColliderBox::intertialTensorInverted(glm::mat3 &t, float mass) const
     t[1][1] = prod * 1.0f / (a_ * a_ + c_ * c_);
     t[1][2] = 0.0f;
     t[2][0] = 0.0f;
-    t[2][1] = prod * 1.0f / (a_ * a_ + b_ * b_);
-    t[2][2] = 0.0f;
+    t[2][1] = 0.0f;
+    t[2][2] = prod * 1.0f / (a_ * a_ + b_ * b_);
 }

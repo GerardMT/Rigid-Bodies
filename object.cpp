@@ -35,8 +35,8 @@ void Object::setRigibody(RigidBody &r)
     rigid_body_->pos_ = &pos_;
     rigid_body_->rot_ = &rot_;
 
-    rigid_body_->collider_->rotate(rot_);
     rigid_body_->collider_->translate(pos_);
+    rigid_body_->collider_->rotate(rot_);
 }
 
 void Object::initialieGL()

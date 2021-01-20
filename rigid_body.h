@@ -44,9 +44,10 @@ public:
 
     bool fixed_;
 
+    glm::quat *rot_;
+
 private:
     glm::vec3 *pos_;
-    glm::quat *rot_;
 };
 
 #endif // RIGIDBODY_H

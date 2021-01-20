@@ -37,6 +37,7 @@ void solve(RigidBody &r, float dt)
     r.i_inv_ = rot_mat * r.inertia_tensor_inv_ * glm::transpose(rot_mat);
     r.w_ = r.i_inv_ * r.ang_mom_;
     glm::quat rot_der_ = 0.5f * (glm::quat(0.0, (r.w_)) * r.rot());
+
     glm::quat rot_diff = glm::normalize(r.rot() + dt * rot_der_) * glm::inverse(r.rot());
     r.rotate(rot_diff);
 }
