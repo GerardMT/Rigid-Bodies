@@ -42,12 +42,12 @@ void Object::setRigibody(RigidBody &r)
 void Object::initialieGL()
 {
     string vert_str;
-    readFile("../shader/object.vert", vert_str);
+    readFile("../../res/shader/object.vert", vert_str);
     program_.addShaderFromSourceCode(QOpenGLShader::Vertex, vert_str.c_str());
     cout << program_.log().toUtf8().constData() << endl;
 
     string frag_str;
-    readFile("../shader/object.frag", frag_str);
+    readFile("../../res/shader/object.frag", frag_str);
     program_.addShaderFromSourceCode(QOpenGLShader::Fragment, frag_str.c_str());
     cout << program_.log().toUtf8().constData() << endl;
 

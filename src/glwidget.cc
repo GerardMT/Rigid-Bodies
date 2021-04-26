@@ -49,7 +49,7 @@ void GLWidget::initializeGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     scene_ = -1;
-    uiScene4();
+    uiScene1();
 
     rigid_bodies_system->coefficient_of_restitution_ = parent()->findChild<QDoubleSpinBox *>("coefficientOfRestitution")->value();
     rigid_bodies_system->fix_on_resting_ = parent()->findChild<QCheckBox *>("fixOnResting")->isChecked();
@@ -205,7 +205,7 @@ void GLWidget::uiScene1()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 4.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -218,7 +218,7 @@ void GLWidget::uiScene1()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -248,7 +248,7 @@ void GLWidget::uiScene2()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 4.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -261,7 +261,7 @@ void GLWidget::uiScene2()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 8.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -274,7 +274,7 @@ void GLWidget::uiScene2()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -304,7 +304,7 @@ void GLWidget::uiScene3()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 5.0f, 0.41f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -317,7 +317,7 @@ void GLWidget::uiScene3()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 0.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -362,7 +362,7 @@ void GLWidget::uiScene4()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 3.0f, 0.25 + 0.707106781f),  eulerToQuat(glm::radians(glm::vec3(0.0, 45.0, 0.0))), *m, glm::vec4(1.0, 0.0, 1.0, 1.0));
         objects_.push_back(box);
@@ -375,7 +375,7 @@ void GLWidget::uiScene4()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -405,7 +405,7 @@ void GLWidget::uiScene5()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 16.0, 0.5f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -418,7 +418,7 @@ void GLWidget::uiScene5()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/cube.ply", *m);
+        Mesh::ReadFromPly("../../res/model/cube.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 8.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 1.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -431,7 +431,7 @@ void GLWidget::uiScene5()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/sphere.ply", *m);
+        Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
         Object *sphere = new Object(glm::vec3(0.0f, 6.0, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(0.0, 0.0, 1.0, 1.0));
         objects_.push_back(sphere);
@@ -444,7 +444,7 @@ void GLWidget::uiScene5()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/box_10_1_10.ply", *m);
+        Mesh::ReadFromPly("../../res/model/box_10_1_10.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 1.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
@@ -496,7 +496,7 @@ void GLWidget::uiScene6()
         if (save) {
             {
                 Mesh *m = new Mesh();
-                Mesh::ReadFromPly("../model/sphere.ply", *m);
+                Mesh::ReadFromPly("../../res/model/sphere.ply", *m);
 
                 Object *sphere = new Object(pos, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0));
                 objects_.push_back(sphere);
@@ -513,7 +513,7 @@ void GLWidget::uiScene6()
 
     {
         Mesh *m = new Mesh();
-        Mesh::ReadFromPly("../model/box_10_1_10.ply", *m);
+        Mesh::ReadFromPly("../../res/model/box_10_1_10.ply", *m);
 
         Object *box = new Object(glm::vec3(0.0f, 1.0f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), *m, glm::vec4(1.0, 0.0, 0.0, 1.0));
         objects_.push_back(box);
