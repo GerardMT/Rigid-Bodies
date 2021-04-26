@@ -4,7 +4,7 @@ A very simple CPU driven rigid bodies system with an OpenGL renderer. Used Qt 5 
 The rigid body system implementation is based on the _Physically Based Modeling SIGGRAPH 2001 Course_ notes.
 
 ## Features
-- Control the camera (`WASD` keys for movement, and `mouse click` + `mouse movement` for orientation).
+- Control the camera (`WASD` keys for movement, and `mouse left click` + `mouse movement` for orientation).
 - Semi-implicit Euler as the numerical solver.
 - Collider types implemented:
 	- Sphere
