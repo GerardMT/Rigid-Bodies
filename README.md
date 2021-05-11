@@ -1,5 +1,5 @@
 # Rigid Bodies
-A very simple CPU driven rigid bodies system with an OpenGL renderer. Used Qt 5 as the base framework.
+A very simple CPU driven rigid bodies system with an OpenGL renderer. Qt 5 used as the base framework.
 
 The rigid body system implementation is based on the _Physically Based Modeling SIGGRAPH 2001 Course_ notes.
 
